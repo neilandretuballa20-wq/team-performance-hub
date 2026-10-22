@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vibrant Team Hub</title>
+  <link rel="stylesheet" href="styles.css">
+  <!-- Supabase CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+  <!-- AUTH SECTION -->
+  <div id="auth-screen" class="glass-card">
+    <h1 class="bounce-title">🌈 Team Portal 🚀</h1>
+    <div id="auth-forms">
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="auth-email" placeholder="name@company.com">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="auth-password" placeholder="••••••••">
+      </div>
+      <div class="form-group" id="name-group">
+        <label>Full Name</label>
+        <input type="text" id="auth-fullname" placeholder="John Doe">
+      </div>
+      <button class="btn btn-rainbow" id="btn-login">Log In</button>
+      <button class="btn btn-secondary" id="btn-signup">Sign Up</button>
+    </div>
+  </div>
+
+  <!-- TEAM SELECTION SCREEN -->
+  <div id="team-select-screen" class="glass-card hidden">
+    <h2>Welcome, <span id="user-display-name"></span>! 🎉</h2>
+    <p>Select your team to enter your workspace:</p>
+    <div class="team-grid">
+      <button class="team-card team-a" onclick="selectTeam('Team Alpha')">🦄 Team Alpha</button>
+      <button class="team-card team-b" onclick="selectTeam('Team Beta')">🔥 Team Beta</button>
+      <button class="team-card team-c" onclick="selectTeam('Team Gamma')">⚡ Team Gamma</button>
+    </div>
+  </div>
+
+  <!-- MAIN DASHBOARD -->
+  <div id="dashboard" class="hidden">
+    <header class="top-nav">
+      <h2 id="current-team-title"></h2>
+      <div class="nav-actions">
+        <span id="user-badge"></span>
+        <button class="btn btn-small" onclick="switchTeam()">Switch Team</button>
+        <button class="btn btn-small btn-danger" onclick="logout()">Logout</button>
+      </div>
+    </header>
+
+    <div class="dashboard-grid">
+      
+      <!-- 1. PPH CALCULATOR -->
+      <section class="card widget-pph">
+        <h3>⏱️ Live PPH Calculator (Target: 120/hr)</h3>
+        <div class="input-row">
+          <div>
+            <label>Lines Finished:</label>
+            <input type="number" id="pph-lines" placeholder="e.g. 35">
+          </div>
+          <div>
+            <label>Minutes:</label>
+            <input type="number" id="pph-mins" placeholder="3">
+          </div>
+          <div>
+            <label>Seconds:</label>
+            <input type="number" id="pph-secs" placeholder="32">
+          </div>
+        </div>
+        <button class="btn btn-rainbow" onclick="calculatePPH()">Calculate & Record Batch</button>
+
+        <div class="pph-results">
+          <div class="stat-box">
+            <h4>Last Batch PPH</h4>
+            <div id="latest-pph" class="stat-value">0.0</div>
+          </div>
+          <div class="stat-box highlight">
+            <h4>10-Hour Shift Cumulative Average</h4>
+            <div id="cumulative-pph" class="stat-value">0.0</div>
+          </div>
+        </div>
+
+        <h4>Shift Logs History</h4>
+        <ul id="pph-log-list" class="log-list"></ul>
+      </section>
+
+      <!-- 2. COACHING SCHEDULE & BULK IMPORT -->
+      <section class="card widget-coaching">
+        <h3>📅 Coaching Schedule</h3>
+        
+        <div class="import-box">
+          <h4>Bulk CSV Import</h4>
+          <p class="help-text">Format: <code>Member Name, YYYY-MM-DD, HH:MM AM/PM, Topic</code></p>
+          <textarea id="csv-coaching-input" rows="3" placeholder="John Doe, 2026-10-25, 10:00 AM, Quality Review&#10;Jane Smith, 2026-10-25, 02:00 PM, Metric Analysis"></textarea>
+          <button class="btn btn-small" onclick="bulkImportCoaching()">Import Schedules</button>
+        </div>
+
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Member</th>
+              <th>Date</th>
+              <th>Time</th>
+              <th>Topic</th>
+            </tr>
+          </thead>
+          <tbody id="coaching-table-body"></tbody>
+        </table>
+      </section>
+
+      <!-- 3. IC EXTENSION REPORT -->
+      <section class="card widget-ic">
+        <h3>📢 IC Extension Report</h3>
+        <div class="ic-add-form">
+          <input type="text" id="ic-member" placeholder="Member Name">
+          <select id="ic-status">
+            <option value="Extended">Has IC Extension</option>
+            <option value="Required to Extend">Required to Extend</option>
+          </select>
+          <input type="text" id="ic-reason" placeholder="Reason / Project details">
+          <button class="btn btn-small" onclick="addICReport()">Add Report</button>
+        </div>
+
+        <div class="ic-tables-split">
+          <div>
+            <h4>Members with IC Extensions</h4>
+            <ul id="ic-extended-list" class="ic-list badge-extended"></ul>
+          </div>
+          <div>
+            <h4>Members Required to Extend</h4>
+            <ul id="ic-required-list" class="ic-list badge-required"></ul>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <!-- 4. FLOATING CHAT BUBBLE -->
+  <div id="chat-bubble" onclick="toggleChat()">💬</div>
+
+  <div id="chat-window" class="hidden">
+    <div class="chat-header">
+      <span>Team Questions & Answers</span>
+      <button onclick="toggleChat()">✕</button>
+    </div>
+    <div id="chat-messages" class="chat-body"></div>
+    <div class="chat-footer">
+      <input type="text" id="chat-input" placeholder="Ask a question or reply..." onkeypress="handleChatKey(event)">
+      <button onclick="sendChatMessage()">Send</button>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
