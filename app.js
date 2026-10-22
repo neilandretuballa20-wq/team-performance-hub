@@ -7,9 +7,11 @@ let currentUser = null;
 let currentTeam = null;
 let pphLogs = [];
 
-// AUTHENTICATION LISTENERS
-document.getElementById('btn-login').addEventListener('click', handleLogin);
-document.getElementById('btn-signup').addEventListener('click', handleSignUp);
+// WAIT FOR HTML TO LOAD BEFORE ATTACHING EVENT LISTENERS
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('btn-login').addEventListener('click', handleLogin);
+  document.getElementById('btn-signup').addEventListener('click', handleSignUp);
+});
 
 async function handleSignUp() {
   const email = document.getElementById('auth-email').value;
