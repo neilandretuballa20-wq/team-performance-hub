@@ -1,4 +1,3 @@
-
 // SUPABASE INITIALIZATION
 const SUPABASE_URL = "https://gglpmgfopukzskedsijd.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_fvAtS8_-Yrk8viNFZGUR4w_6PaCKdh_";
